@@ -1,0 +1,27 @@
+0
+quit
+-1
+restart
+0
+
+0
+'''
+How to play:
+Enter keywords to make choices and perform actions.
+Keywords will be highlighted [like so].
+At any point, you can enter [restart] to restart your adventure, or [quit] to quit.
+Whenever you're [ready], we shall [begin]!
+'''
+{"like so":1, "ready":2, "begin":2}
+
+1
+'''
+Exactly!
+'''
+{"like so":1, "ready":2, "begin":2}
+
+2
+'''
+Welcome to the alpha! [Goodbye]!
+'''
+{"Goodbye":-1}

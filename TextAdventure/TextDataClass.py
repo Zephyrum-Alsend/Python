@@ -133,7 +133,7 @@ class TextData:
     def getStart(self, cont):
         key = self.__startKey
         if cont:
-            with open("Save.txt", "r") as f:
+            with open(os.path.join(sys.path[0], "Save.txt"), "r") as f:
                 key = f.read()
         return key
 
@@ -145,7 +145,7 @@ class TextData:
     def verifySave(self):
         saveVerified = True
         try:
-            with open("Save.txt", "r") as f:
+            with open(os.path.join(sys.path[0], "Save.txt"), "r") as f:
                 key = f.read()
             assert key in self.__data.keys()
         except:
@@ -155,7 +155,7 @@ class TextData:
 
     #Stores key in Save.txt.
     def save(self, key):
-        with open("Save.txt", "w") as f:
+        with open(os.path.join(sys.path[0], "Save.txt"), "w") as f:
             f.write(key)
         return
 

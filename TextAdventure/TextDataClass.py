@@ -17,11 +17,15 @@ __initData()
 __verifyData()
     Ensures all TextEvents reference valid keys.
 getPrompt(key)
-    Returns the TextEvent with the given key.
+    Returns the TextEvent with the given key and saves progress.
 getStart()
     Returns the value of __startKey.
 getExit()
     Returns the value of __quitKey.
+verifySave()
+    Returns whether Save.txt can be opened and contains a valid key.
+save(key)
+    Stores the passed key in Save.txt.
 __str__()
     String conversion for print().
 
@@ -29,8 +33,6 @@ __startKey
     The first TextEvent to display on boot.
 __quitKey
     The key indicating intent to exit.
-__restartKey
-    The TextEvent to jump to when restarting w/o rebooting.
 __data
     Dictionary of TextEvents. {key:TextEvent}
 '''
@@ -38,12 +40,13 @@ __data
 from TextEventClass import TextEvent
 import json
 import sys
+import os
 
 class TextData:
     #Initializes all private variables and verifies data.
     #Will throw errors if Prompts.txt has problems.
     def __init__(self):
-        self.__startKey, self.__quitKey, self.__restartKey, self.__data = self.__initData()
+        self.__startKey, self.__quitKey, self.__data = self.__initData()
         self.__verifyData()
 
     #Parses Prompts.txt into TextEvent objects to store in a dictionary.
@@ -51,7 +54,7 @@ class TextData:
         d = {}
 
         try:
-            with open("Prompts.txt", "rt") as f:
+            with open(os.path.join(sys.path[0], "Prompts.txt"), "rt") as f:
                 text = f.read().splitlines()
         except:
             sys.exit("Error attempting to read Prompts.txt file.")
@@ -104,7 +107,7 @@ class TextData:
             #Interpret line as a key.
             k = line
 
-        return (startKey, quitKey, restartKey, d)
+        return (startKey, quitKey, d)
 
     #Checks all keys referenced in __data exist.
     #Records all misreferenced keys before reporting them.
@@ -122,21 +125,44 @@ class TextData:
 
     #Given a key, return a TextEvent object.
     def getPrompt(self, key):
-        return self.__data[key]
+        txtevt = self.__data[key]
+        self.save(key) #Save after attempting to use the key, confirming it's valid.
+        return txtevt
 
     #Return the key of the first TextEvent object.
-    def getStart(self):
-        return self.__startKey
+    def getStart(self, cont):
+        key = self.__startKey
+        if cont:
+            with open("Save.txt", "r") as f:
+                key = f.read()
+        return key
 
     #Return the quitKey.
     def getExit(self):
         return self.__quitKey
 
+    #Checks if Save.txt can be opened and contains a valid key.
+    def verifySave(self):
+        saveVerified = True
+        try:
+            with open("Save.txt", "r") as f:
+                key = f.read()
+            assert key in self.__data.keys()
+        except:
+            saveVerified = False
+
+        return saveVerified
+
+    #Stores key in Save.txt.
+    def save(self, key):
+        with open("Save.txt", "w") as f:
+            f.write(key)
+        return
+
     #String conversion for print().
     def __str__(self):
         s = 'start ' + self.__startKey
         s += '\nquit ' + self.__quitKey
-        s += '\nrestart ' + self.__restartKey
         for x in self.__data.keys():
             s += '\n' + x + ':' + str(self.__data[x])
         return s

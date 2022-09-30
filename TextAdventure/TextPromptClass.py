@@ -11,7 +11,9 @@ quitKey.
 
 __init__(qk)
     Constructor. Takes a quitKey.
-Prompt(txtevt)
+continuePrompt()
+    Returns whether the user wishes to continue from a save file.
+prompt(txtevt)
     Displays the prompt inside txtevt and parses input for keywords.
     Returns a key for the next TextEvent.
 
@@ -26,8 +28,13 @@ class TextPrompt:
     def __init__(self, qk):
         self.__quitKey = qk
 
+    #Asks the user if they wish to resume from a save file.
+    def continuePrompt(self):
+        userInput = input("Continue where you left off? Y/N\n").lower()
+        return ("y" in userInput)
+
     #Show the user the prompt and receive their input. Return key for next prompt.
-    def Prompt(self, txtevt):
+    def prompt(self, txtevt):
         #Show prompt only once.
         print(txtevt.getPrompt())
 

@@ -31,10 +31,14 @@ class TextController:
 
     #Main
     def run(self):
-        key = self.__model.getStart()
+        cont = False
+        if self.__model.verifySave():
+            cont = self.__view.continuePrompt()
+
+        key = self.__model.getStart(cont)
 
         while key != self.__quitKey:
-            key = self.__view.Prompt(self.__model.getPrompt(key))
+            key = self.__view.prompt(self.__model.getPrompt(key))
 
         return
 

@@ -10,25 +10,43 @@ import os
 import sys
 
 #Calculates buster damage per second, given damage and frames for charging, start up, and cooldown.
-def busterCalc(dmg, chg, sta, cld = 20):
+#If the flashing flag is set, will account for waiting for flashing to run out.
+def busterCalc(dmg, chg, sta, cld = 20, fls = False):
+    if fls and (chg + sta + cld) < 120:
+        return dmg/2
     return round((dmg / ((chg + sta + cld)/60)), 1)
 
 #Calculates bugged buster damage per second, given damage, frames for start up and cooldown, and misfire chance.
 def busterBugCalc(dmg, sta, cld, mis):
     return round((dmg+(dmg*9*mis)) / (((sta+(sta*mis))+cld)/60), 1)
 
+#Creates a table of chargeshot DPS for Attack Lv1-5 and Charge Lv1-5.
+def attackChargeTable(base, mult, chgArr, sta, cld = 20, fls = False):
+    table = []
+    for c in range(5):
+        sub = []
+        for a in range(1, 6):
+            damage = base + (a * mult)
+            item = str(busterCalc(damage, chgArr[c], sta, cld))+' ('+str(busterCalc(damage, chgArr[c], sta, cld, fls))+')'
+            sub.append(item)
+        table.append(sub)
+
+    return table
+
 #Converts a data table into a string table with labeled axes.
-def makeTable(arr):
+def makeTable(arr, x, y, tabs = 1):
     table = '\t'
     for i in range(len(arr[0])):
-        table += str(i+1) + '\t'
-    table += 'Panels'
+        table += str(i+1)
+        for i in range(tabs):
+            table += '\t'
+    table += x
 
     for j in range(len(arr)):
         table += '\n' + str(j+1)
         for i in arr[j]:
             table += '\t' + str(i)
-    table += '\nSpeed'
+    table += '\n' + y
     
     return table
 
@@ -42,6 +60,18 @@ def main():
             [3, 4, 5, 6, 7, 8]
             ]
 
+    #Frame data for cross charge shots at all charge levels.
+    Heat = [70, 60, 50, 45, 40]
+    Elec = [90, 80, 70, 65, 60]
+    Slash = [80, 70, 60, 55, 50]
+    Erase = [110, 100, 90, 85, 80]
+    Charge = [90, 80, 70, 65, 60]
+    Spout = [60, 50, 40, 30, 20]
+    Toma = [120, 110, 100, 95, 90]
+    Tengu = [100, 90, 80, 75, 70]
+    Ground = [100, 90, 80, 75, 70]
+    Dust = [80, 70, 60, 55, 50]
+
     DPSTable = ''
 
 
@@ -53,7 +83,7 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterCalc(5, 0, 5, speed[s][f]))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
     DPSTable += '\n\nChargeshot DPS:\n'
     DPS = []
@@ -62,7 +92,7 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterCalc(50, 60, 10, speed[s][f]))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
 
     #Buster bug
@@ -73,7 +103,7 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterCalc(50, 0, 10, speed[s][f]))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
     DPSTable += '\n\nBuster Bug Lv3 AVG DPS:\n'
     DPS = []
@@ -82,7 +112,7 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterBugCalc(5, 5, speed[s][f], 3/16))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
     DPSTable += '\n\nBuster Bug Lv2 AVG DPS:\n'
     DPS = []
@@ -91,7 +121,7 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterBugCalc(5, 5, speed[s][f], 2/16))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
     DPSTable += '\n\nBuster Bug Lv1 AVG DPS:\n'
     DPS = []
@@ -100,38 +130,36 @@ def main():
         for f in range(len(speed[s])):
             subDPS.append(busterBugCalc(5, 5, speed[s][f], 1/16))
         DPS.append(subDPS)
-    DPSTable += makeTable(DPS)
+    DPSTable += makeTable(DPS, 'Panels', 'Speed')
 
 
     #Beast buster
     DPSTable += '\n\nGregar vulcan:\t'+str(busterCalc(5, 0, 5, 0))
     DPSTable += '\nFalzar feather:\t'+str(busterCalc(5, 0, 5, 3))+' >'+str(busterCalc(5, 0, 5, 3)*2/3)+'<'
 
-
     #Cross charge shots
-    DPSTable += '\n\nDPS (w/ Flashing)*unknown cooldown, assume 20f'
-    
+    DPSTable += '\n\nDPS (w/ Flashing)\n*unknown cooldown, assume 20f'
+
     DPSTable += '\n\nGregar cross DPS:'
-    DPSTable += '\nHeat:\t'+str(busterCalc(130, 40, 1, 61))+' ('+str(130/2)+')'
-    DPSTable += '\nElec:\t'+str(busterCalc(140, 60, 12, 26))+' ('+str(140/2)+')'
-    DPSTable += '\nSlash:\t'+str(busterCalc(160, 50, 12))+' ('+str(160/2)+')*'
-    DPSTable += '\nErase:\t'+str(busterCalc(140, 80, 7, 70))+' ('+str(busterCalc(140, 80, 7, 70))+')'
-    DPSTable += '\nCharge:\t'+str(busterCalc(130, 60, 12, 34))+' ('+str(130/2)+')'
+    DPSTable += '\n\nHeat:\n'+makeTable(attackChargeTable(30, 20, Heat, 1, 61, fls = True), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nElec:\n'+makeTable(attackChargeTable(40, 20, Elec, 12, 26, fls = True), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nSlash*:\n'+makeTable(attackChargeTable(60, 20, Slash, 12, fls = True), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nErase:\n'+makeTable(attackChargeTable(40, 20, Erase, 7, 70, fls = False), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nCharge:\n'+makeTable(attackChargeTable(30, 20, Charge, 12, 34, fls = True), 'Attack', 'Charge', 2)
 
     DPSTable += '\n\nFalzar cross DPS:'
-    DPSTable += '\nSpout:\t'+str(busterCalc(70, 20, 3))+' ('+str(70/2)+')*'
-    DPSTable += '\nToma:\t'+str(busterCalc(140, 90, 26))+' ('+str(busterCalc(140, 90, 26))+')*'
-    DPSTable += '\nTengu:\t'+str(busterCalc(140, 70, 12))+' ('+str(busterCalc(140, 70, 12))+')*'
-    DPSTable += '\nGround:\t'+str(busterCalc(180, 70, 40, 23))+' ('+str(busterCalc(180, 70, 40, 23))+')'
-    DPSTable += '\nDust:\t'+str(busterCalc(100, 50, 9))+' ('+str(100/2)+')*'
-
+    DPSTable += '\n\nSpout*:\n'+makeTable(attackChargeTable(20, 10, Spout, 3, fls = True), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nToma*:\n'+makeTable(attackChargeTable(40, 20, Toma, 26, fls = False), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nTengu*:\n'+makeTable(attackChargeTable(40, 20, Tengu, 12, fls = False), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nGround:\n'+makeTable(attackChargeTable(30, 30, Ground, 40, 23, fls = False), 'Attack', 'Charge', 2)
+    DPSTable += '\n\nDust*:\n'+makeTable(attackChargeTable(50, 10, Dust, 9, fls = True), 'Attack', 'Charge', 2)
 
     #Giga charge shots
     DPSTable += '\n\nGiga chip DPS:'
-    DPSTable += '\nBugRSwrd:\t'+str(busterCalc(200, 120, 12))+'*'
-    DPSTable += '\nBgDthThd:\t'+str(busterCalc(200, 200, 1))+'*'
+    DPSTable += '\nBugRSwrd*:\t'+str(busterCalc(200, 120, 12))+' ('+str(busterCalc(200, 120, 12, fls = True))+')'
+    DPSTable += '\nBgDthThd*:\t'+str(busterCalc(200, 200, 1))+' ('+str(busterCalc(200, 200, 1, fls = False))+')'
 
-
+    
     #Write to file and print to console for debug
     with open(os.path.join(sys.path[0], "BusterDPS.txt"), "w") as f:
             f.write(DPSTable)

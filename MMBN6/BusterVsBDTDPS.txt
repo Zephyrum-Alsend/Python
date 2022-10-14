@@ -1,0 +1,12 @@
+Normal:	-150	- -100
+Heat:	-70	- -70
+Elec:	-60	- -60
+Slash:	-40	- -40
+Erase:	-60	- -60
+Charge:	-70	- -70
+Spout:	-130	- -130
+Toma:	11.9
+Tengu:	-60	- -60
+Ground:	-20	- -20
+Dust:	-100	- -100
+BRS:	-200	- 0

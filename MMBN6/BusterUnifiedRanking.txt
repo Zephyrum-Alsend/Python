@@ -1,0 +1,37 @@
+w/ Flashing:
+Tengu 85.7
+Slash 80
+BRS 80
+Elec 70
+Ground 69.2
+Heat 65
+Charge 65
+Tomahawk 62.7
+Gregar 60
+BusterBug 47.6-67.5
+Erase 55.3
+BDT 50.8
+Dust 50
+Normal 40
+Falzar 37.5 >25<
+Spout 35
+Peashot 18.8-27.3
+
+w/o Flashing:
+Slash 120
+Spout 97.7
+Elec 91.3
+Tengu 85.7
+BRS 80
+Heat 72.9
+Charge 72.9
+Dust 69.8
+Ground 69.2
+BusterBug 67.5
+Tomahawk 62.7
+Gregar 60
+Erase 55.3
+BDT 50.8
+Normal 41.1
+Falzar 37.5
+Peashot 27.3
